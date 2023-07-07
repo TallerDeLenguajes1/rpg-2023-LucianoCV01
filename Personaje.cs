@@ -3,7 +3,7 @@ namespace EspacioPersonaje
     public class Personaje
     {
         // Datos
-        TipoPersonaje tipo;
+        string? tipo;
         string? nombre;
         string? apodo;
         DateTime fechaDeNacimiento;
@@ -16,7 +16,7 @@ namespace EspacioPersonaje
         int armadura; // 1 a 10
         int salud; // 100
 
-        public TipoPersonaje Tipo { get => tipo; set => tipo = value; }
+        public string? Tipo { get => tipo; set => tipo = value; }
         public string? Nombre { get => nombre; set => nombre = value; }
         public string? Apodo { get => apodo; set => apodo = value; }
         public DateTime FechaDeNacimiento { get => fechaDeNacimiento; set => fechaDeNacimiento = value; }
@@ -27,16 +27,5 @@ namespace EspacioPersonaje
         public int Nivel { get => nivel; set => nivel = value; }
         public int Armadura { get => armadura; set => armadura = value; }
         public int Salud { get => salud; set => salud = value; }
-    }
-    public enum TipoPersonaje
-    {
-        Atraedor,
-        Lanzamonedas,
-        OjoDeEstanio,
-        Violento,
-        Encendedor,
-        Aplacador,
-        Ahumador,
-        Buscador,
     }
 }
