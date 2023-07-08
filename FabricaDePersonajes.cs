@@ -22,7 +22,7 @@ namespace EspacioFabrica
             Personaje nuevoPersonaje = new();
             Random rand = new();
             // Datos
-            nuevoPersonaje.Tipo = tipoPersonaje[rand.Next(7)];
+            nuevoPersonaje.Tipo = tipoPersonaje[rand.Next(6)];
             int numeroAleatorio = rand.Next(10);
             nuevoPersonaje.Nombre = nombresYapodos[numeroAleatorio, 0];
             nuevoPersonaje.Apodo = nombresYapodos[numeroAleatorio, 1];
