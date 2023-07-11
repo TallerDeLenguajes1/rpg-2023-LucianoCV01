@@ -27,5 +27,10 @@ namespace EspacioPersonaje
         public int Nivel { get => nivel; set => nivel = value; }
         public int Armadura { get => armadura; set => armadura = value; }
         public int Salud { get => salud; set => salud = value; }
+
+        public string MostrarPersonaje()
+        {
+            return $"    {Nombre} ---> '{Apodo}'\n    Tipo: {Tipo}\n    Edad: {Edad}\n    Velocidad: {Velocidad}\n    Destreza: {Destreza}\n    Fuerza: {Fuerza}\n    Nivel: {Nivel}\n    Armadura: {Armadura}\n    Salud: {Salud}\n";
+        }
     }
 }
