@@ -5,42 +5,35 @@ internal class Program
 {
     private static void Main(string[] args)
     {
+        const int cantidadPersonajes = 10;
         const string nombreArchivoJson = "Personajes.json";
         PersonajesJson archivoJson = new();
+        List<Personaje>? listadoPersonajes = new();
         if (archivoJson.Existe(nombreArchivoJson))
         {
-            var listadoPersonajes = archivoJson.LeerPersonajes(nombreArchivoJson);
-            if (listadoPersonajes != null)
-            {
-                for (int i = 0; i < 10; i++)
-                {
-                    Console.WriteLine("------ Personaje {0} ------", i);
-                    Console.WriteLine(listadoPersonajes[i].MostrarPersonaje());
-                }      
-                while (listadoPersonajes.Count != 1)
-                {
-                    var jugador1 = PersonajeAleatorio(listadoPersonajes);
-                    listadoPersonajes.Remove(jugador1);
-                    var jugador2 = PersonajeAleatorio(listadoPersonajes);
-                    listadoPersonajes.Remove(jugador2);
-                    listadoPersonajes.Add(Pelea(jugador1, jugador2));
-                }
-            }
+            listadoPersonajes = archivoJson.LeerPersonajes(nombreArchivoJson);
         } else
         {
             FabricaDePersonajes crear = new();
-            List<Personaje> listadoPersonajes = new();
-            for (int i = 0; i < 10; i++)
-            {
-                var personaje = crear.crearPersonaje();
-                listadoPersonajes.Add(personaje);
-            }
+            listadoPersonajes = crear.CargarListaPersonajesAleatorios(cantidadPersonajes);
             archivoJson.GuardarPersonajes(listadoPersonajes, nombreArchivoJson);
-            for (int i = 0; i < 10; i++)
+        }
+        // Mejorar Segmentacion
+        if (listadoPersonajes != null)
+        {
+            for (int i = 0; i < cantidadPersonajes; i++)
             {
                 Console.WriteLine("------ Personaje {0} ------", i);
                 Console.WriteLine(listadoPersonajes[i].MostrarPersonaje());
-            }
+            }      
+            // while (listadoPersonajes.Count != 1)
+            // {
+            //     var jugador1 = PersonajeAleatorio(listadoPersonajes);
+            //     listadoPersonajes.Remove(jugador1);
+            //     var jugador2 = PersonajeAleatorio(listadoPersonajes);
+            //     listadoPersonajes.Remove(jugador2);
+            //     listadoPersonajes.Add(Pelea(jugador1, jugador2));
+            // }
         }
     }
     public static int DanioProvocado(Personaje atacante, Personaje defensor)
