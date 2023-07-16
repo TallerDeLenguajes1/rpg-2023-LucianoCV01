@@ -1,39 +1,88 @@
 ﻿using EspacioPersonaje;
 using EspacioFabrica;
 using EspacioPersonajesJson;
+using EspacioMensajes;
 internal class Program
 {
     private static void Main(string[] args)
     {
+        Mensajes expresiones = new();
+        Console.Write("\u001b[38;2;242;199;119m{0}\u001b[0m", expresiones.titulo); // Color: #F2C777
+        Console.WriteLine("\u001b[38;2;166;119;78m{0}\u001b[0m", expresiones.subtitulo); // Color: #A6774E
+        string? numero;
+        do
+        {
+        Console.WriteLine("------> ELIJA EL MODO DE JUEGO: ");
+        Console.WriteLine(expresiones.modoJuego);
+        numero = Console.ReadLine();
+        } while (numero != "1" && numero != "2");
+
         const int cantidadPersonajes = 10;
         const string nombreArchivoJson = "Personajes.json";
+        const string nombreJsonPersonajes = "PersonajesMistborn.json";
         PersonajesJson archivoJson = new();
         List<Personaje>? listadoPersonajes = new();
-        if (archivoJson.Existe(nombreArchivoJson))
+
+        if (numero == "1")
         {
-            listadoPersonajes = archivoJson.LeerPersonajes(nombreArchivoJson);
+            listadoPersonajes = archivoJson.LeerPersonajes(nombreJsonPersonajes);
         } else
         {
-            FabricaDePersonajes crear = new();
-            listadoPersonajes = crear.CargarListaPersonajesAleatorios(cantidadPersonajes);
-            archivoJson.GuardarPersonajes(listadoPersonajes, nombreArchivoJson);
+            if (archivoJson.Existe(nombreArchivoJson))
+            {
+                listadoPersonajes = archivoJson.LeerPersonajes(nombreArchivoJson);
+            } else
+            {
+                FabricaDePersonajes crear = new();
+                listadoPersonajes = crear.CargarListaPersonajesAleatorios(cantidadPersonajes);
+                archivoJson.GuardarPersonajes(listadoPersonajes, nombreArchivoJson);
+            }    
         }
         // Mejorar Segmentacion
         if (listadoPersonajes != null)
         {
+            Console.Clear();
             for (int i = 0; i < cantidadPersonajes; i++)
             {
-                Console.WriteLine("------ Personaje {0} ------", i);
+                Console.WriteLine("╔═════════════════ Personaje {0} ════════════════╗", i);
                 Console.WriteLine(listadoPersonajes[i].MostrarPersonaje());
-            }      
-            // while (listadoPersonajes.Count != 1)
-            // {
-            //     var jugador1 = PersonajeAleatorio(listadoPersonajes);
-            //     listadoPersonajes.Remove(jugador1);
-            //     var jugador2 = PersonajeAleatorio(listadoPersonajes);
-            //     listadoPersonajes.Remove(jugador2);
-            //     listadoPersonajes.Add(Pelea(jugador1, jugador2));
-            // }
+                Console.WriteLine("╚══════════════════════════════════════════════╝");     
+            } 
+            
+            Personaje? jugador1=null;
+            if (numero == "1")
+            {
+                Console.WriteLine("ELIJA SU PERSONAJE: ");
+                string? numPersonaje = Console.ReadLine();
+                if (numPersonaje != null)
+                {
+                    int numPersona = int.Parse(numPersonaje);             
+                    jugador1 = listadoPersonajes[numPersona];
+                    listadoPersonajes.Remove(jugador1);
+                }
+            } else
+            {
+                jugador1 = PersonajeAleatorio(listadoPersonajes);
+                listadoPersonajes.Remove(jugador1);
+            }    
+            Console.Clear();
+            if (jugador1 !=null)
+            { 
+                int flag = 1;
+                while (listadoPersonajes.Count != 1 && flag==1)
+                {
+                    Console.Clear();
+                    var jugador2 = PersonajeAleatorio(listadoPersonajes);
+                    listadoPersonajes.Remove(jugador2);
+                    var ganador = Pelea(jugador1, jugador2);
+                    if (ganador != jugador1)
+                    {
+                        Console.WriteLine("Perdedor");
+                        flag=0;
+                    }
+                    Console.ReadKey();
+                }    
+            }
         }
     }
     public static int DanioProvocado(Personaje atacante, Personaje defensor)

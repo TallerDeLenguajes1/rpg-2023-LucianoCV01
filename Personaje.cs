@@ -30,7 +30,7 @@ namespace EspacioPersonaje
 
         public string MostrarPersonaje()
         {
-            return $"\t{Nombre} ---> '{Apodo}'\n\tTipo: {Tipo}\n\tEdad: {Edad}\n\tVelocidad: {Velocidad}\n\tDestreza: {Destreza}\n\tFuerza: {Fuerza}\n\tNivel: {Nivel}\n\tArmadura: {Armadura}\n\tSalud: {Salud}\n";
+            return $" '{Apodo}'\n {Nombre} ---> {Tipo}\n Velocidad: {Velocidad}\n Destreza: {Destreza}\n Fuerza: {Fuerza}\n Nivel: {Nivel}\n Armadura: {Armadura}\n Salud: {Salud}";
         }
     }
 }
