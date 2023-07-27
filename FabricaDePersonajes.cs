@@ -57,7 +57,7 @@ namespace EspacioFabrica
             var FechaNacimiento = FechaActual.AddYears(-edad);
             return FechaNacimiento;
         }
-        public List<Personaje> CargarListaPersonajesAleatorios(int cantidadPersonajes)
+        public List<Personaje> ListaPersonajesAleatorios(int cantidadPersonajes)
         {
             int i = 0;
             List<Personaje> listaPersonajes = new();
