@@ -4,14 +4,14 @@ using EspacioPersonaje;
 using EspacioFabrica;
 using EspacioPersonajesJson;
 using EspacioMensajes;
-using EspacioCitas;
+using EspacioFrutas;
 internal class Program
 {
     private static void Main(string[] args)
     {
-        const int cantidadPersonajes = 10;
         const string nombreArchivoJson = "Personajes.json";
         PersonajesJson archivoJson = new();
+        const int cantidadPersonajes = 10;
         List<Personaje>? listadoPersonajes = new();
         if (archivoJson.Existe(nombreArchivoJson))
         {
@@ -28,7 +28,6 @@ internal class Program
         do
         {
             Console.WriteLine("\u001b[38;2;242;199;119m{0}\u001b[0m", expresiones.titulo); // Color: #F2C777
-            ObtenerCita();
             Console.WriteLine("------> ELIJA EL MODO DE JUEGO: ");
             Console.WriteLine(expresiones.modoJuego);
             opcionJuego = Console.ReadLine();
@@ -72,20 +71,36 @@ internal class Program
                     var jugador2 = PersonajeAleatorio(listadoPersonajes);
                     listadoPersonajes.Remove(jugador2);
 
-                    Console.WriteLine("╔══════════════════════════════════════════════╗");
+                    Console.WriteLine("╔════════════════════ PELEA ═══════════════════╗");
                     Console.WriteLine(jugador1.MostrarPersonaje());
-                    Console.WriteLine(" ---------- VS ----------");
+                    Console.WriteLine("        --------------- VS ---------------");
                     Console.WriteLine(jugador2.MostrarPersonaje());
                     Console.WriteLine("╚══════════════════════════════════════════════╝");
 
                     var ganador = Pelea(jugador1, jugador2);
-                    if (ganador != jugador1)
+
+                    Console.ReadKey();
+                    if (ganador == jugador1)
                     {
-                        Console.WriteLine("Perdedor");
+                        Console.WriteLine("╔═════════════ GANADOR: JUGADOR 1 ═════════════╗");
+                        Console.WriteLine(jugador1.MostrarPersonaje());
+                        Console.WriteLine("╚══════════════════════════════════════════════╝");
+                        Recompensa(jugador1);
+                    } else
+                    {
+                        Console.WriteLine("╔═════════════ GANADOR: JUGADOR 2 ═════════════╗");
+                        Console.WriteLine(jugador2.MostrarPersonaje());
+                        Console.WriteLine("╚══════════════════════════════════════════════╝");
                         flag=0;
                     }
-                    Console.ReadKey();
-                }    
+                }   
+                if (flag == 0)
+                {
+                    Console.WriteLine("\u001b[38;2;217;37;37m{0}\u001b[0m", expresiones.gameOver); // color: #D92525
+                } else
+                {
+                    Console.WriteLine("\u001b[38;2;3;166;60m{0}\u001b[0m", expresiones.ganasta); // color: #03A63C
+                }
             }
             
         }
@@ -93,9 +108,9 @@ internal class Program
     public static int DanioProvocado(Personaje atacante, Personaje defensor)
     {
         Random rand = new();
-        const int ajuste = 200;
+        const int ajuste = 250;
         double ataque = atacante.Destreza * atacante.Fuerza * atacante.Nivel;
-        int efectividad = rand.Next(30, 101);
+        int efectividad = rand.Next(50, 101);
         double defensa = defensor.Armadura * defensor.Velocidad;
         double danioProvocado = ((ataque * efectividad) - defensa) / ajuste;
         return ((int)Math.Round(danioProvocado, MidpointRounding.AwayFromZero));
@@ -112,22 +127,22 @@ internal class Program
         int danio;
         while (jugador1.Salud > 0 && jugador2.Salud >0)
         {
-            Console.WriteLine("╔══════════════════════════════════════════════╗");
+            Console.WriteLine($"╔═════════════════════ RONDA {ronda} ════════════════╗\n");
             if (turno == 1)
             {
                 danio = DanioProvocado(jugador1, jugador2);
-                Console.WriteLine($" Ronda {ronda} ------> Jugador {turno}, ataca: {danio}");
+                Console.WriteLine($"           JUGADOR {turno} ATACA ---> {danio}\n");
                 jugador2.Salud -= danio;
                 turno = 2;
             } else
             {
                 danio = DanioProvocado(jugador2, jugador1);
-                Console.WriteLine($" Ronda {ronda} ------> Jugador {turno}, ataca: {danio}");
+                Console.WriteLine($"           JUGADOR {turno} ATACA ---> {danio}\n");
                 jugador1.Salud -= danio;
                 turno = 1;
             }
-            Console.WriteLine($" {jugador1.Apodo} ------> Salud: {jugador1.Salud}");
-            Console.WriteLine($" {jugador2.Apodo} ------> Salud: {jugador2.Salud}");
+            Console.WriteLine($" {jugador1.Apodo} ------> Salud: {jugador1.Salud}\n");
+            Console.WriteLine($" {jugador2.Apodo} ------> Salud: {jugador2.Salud}\n");
             Console.WriteLine("╚══════════════════════════════════════════════╝");
             ronda++;
             Console.ReadKey();
@@ -135,21 +150,15 @@ internal class Program
         }
         if (jugador1.Salud <= 0)
         {
-            jugador2.Salud += 10;
-            Console.WriteLine("Ganador: Jugador 2");
-            Console.WriteLine(jugador2.MostrarPersonaje());
             return jugador2;
         } else
         {
-            jugador1.Salud += 10;
-            Console.WriteLine("Ganador: Jugador 1");
-            Console.WriteLine(jugador1.MostrarPersonaje());
             return jugador1;
         }
     }
-    public static void ObtenerCita()
+    public static List<Fruta>? ObtenerFrutas()
     {
-        var url = $"https://api.quotable.io/quotes/random";
+        var url = $"https://www.fruityvice.com/api/fruit/all";
         var request = (HttpWebRequest)WebRequest.Create(url);
         request.Method = "GET";
         request.ContentType = "application/json";
@@ -160,16 +169,12 @@ internal class Program
             {
                 using (Stream strReader = response.GetResponseStream())
                 {
-                    if (strReader == null) return;
+                    if (strReader == null) return null;
                     using (StreamReader objReader = new StreamReader(strReader))
                     {
                         string responseBody = objReader.ReadToEnd();
-                        List<Cita>? listaCitas = JsonSerializer.Deserialize<List<Cita>>(responseBody);
-                        if (listaCitas != null)
-                        {
-                            Console.WriteLine(listaCitas[0].content);
-                            Console.WriteLine();
-                        }
+                        List<Fruta>? listaFrutas = JsonSerializer.Deserialize<List<Fruta>>(responseBody);
+                        return listaFrutas;
                     }
                 }
             }
@@ -177,6 +182,49 @@ internal class Program
         catch (WebException ex)
         {
              Console.WriteLine("Problemas de acceso a la API");
+             return null;
+        }
+    }
+    public static void Recompensa(Personaje ganador)
+    {
+        Random rand = new();
+        string[] frase = new string[]
+        {
+            "   1. {fruta}: regenera la salud",
+            "   2. {fruta}: aumenta la fuerza en 1",
+            "   3. {fruta}: aumenta la armadura en 1"
+        };
+        var listaFrutas = ObtenerFrutas();
+
+        Console.WriteLine("╔═════════════════ RECOMPENSA ═════════════════╗");
+        for (int i = 0; i < 3; i++)
+        {
+            if (listaFrutas != null)
+            {
+                var fruta = listaFrutas[rand.Next(listaFrutas.Count)];
+                listaFrutas.Remove(fruta);
+                frase[i] = frase[i].Replace("{fruta}", fruta.name);
+            }
+            Console.WriteLine(frase[i]);
+        }            
+        Console.WriteLine("╚══════════════════════════════════════════════╝");
+        string? numRecompensa;
+        do
+        {
+            Console.WriteLine("------> ELIJA SU RECOMPENSA: ");
+            numRecompensa = Console.ReadLine();
+        } while (numRecompensa != "1" && numRecompensa != "2" && numRecompensa != "3");
+        switch (numRecompensa)
+        {
+            case "1":
+                ganador.Salud = 100;
+                break;
+            case "2":
+                ganador.Fuerza += 1;
+                break;
+            case "3":
+                ganador.Armadura += 1;
+                break;    
         }
     }
 }
